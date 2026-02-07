@@ -25,7 +25,9 @@ export class UPSCarrier implements Carrier {
 
       // 🔁 401 → refresh token and retry ONCE
       if (status === 401) {
-        const newToken = await this.authClient.getAccessToken();
+        console.warn("🔄 UPS Token expired. Refreshing and retrying...");
+        // FIX 1: Pass 'true' to force a fresh token
+        const newToken = await this.authClient.getAccessToken(true);
 
         try {
           return await this.fetchRates(request, newToken);
@@ -38,43 +40,43 @@ export class UPSCarrier implements Carrier {
     }
   }
 
- private async fetchRates(
-  request: RateRequest,
-  token: string
-): Promise<RateQuote[]> {
-
-  if (process.env.NODE_ENV !== "production") {
-    // 🔒 Mocked response for local dev
-    return [
-      {
-        carrier: this.name,
-        serviceCode: "UPS_GROUND",
-        serviceName: "UPS Ground",
-        totalCharge: 450,
-        currency: "INR",
-        estimatedDeliveryDays: 3,
-      },
-    ];
-  }
-
-  // Real call (future)
-  const payload = UPSMapper.toUPSPayload(request);
-
-  const response = await axios.post(
-    `${this.baseUrl}/rating/v1/Shop`,
-    payload,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        transId: crypto.randomUUID(),
-        transactionSrc: "Cybership_Takehome",
-      },
+  private async fetchRates(
+    request: RateRequest,
+    token: string
+  ): Promise<RateQuote[]> {
+    // FIX 2: Only short-circuit in 'development', allowing 'test' to run real logic
+    if (process.env.NODE_ENV === "development") {
+      // 🔒 Mocked response for local dev
+      return [
+        {
+          carrier: this.name,
+          serviceCode: "UPS_GROUND",
+          serviceName: "UPS Ground",
+          totalCharge: 450,
+          currency: "INR",
+          estimatedDeliveryDays: 3,
+        },
+      ];
     }
-  );
 
-  return UPSMapper.toDomain(response.data);
-}
+    // Real call (now runs in Production AND Test environments)
+    const payload = UPSMapper.toUPSPayload(request);
+
+    const response = await axios.post(
+      `${this.baseUrl}/rating/v1/Shop`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          transId: crypto.randomUUID(),
+          transactionSrc: "Cybership_Takehome",
+        },
+      }
+    );
+
+    return UPSMapper.toDomain(response.data);
+  }
 
   private handleError(error: any): CarrierError {
     const status =

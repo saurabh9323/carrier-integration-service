@@ -26,23 +26,24 @@ This project is designed as a **production-ready, extensible service layer** tha
 
 ```
 src/
- ├── domain/                 # Core domain models & validation
- │   ├── Address.ts
- │   ├── Package.ts
- │   ├── RateRequest.ts
- │   ├── RateQuote.ts
- │   └── schemas.ts
- │
- ├── carriers/
- │   ├── Carrier.ts          # Carrier interface
- │   └── ups/
- │       ├── UPSCarrier.ts
- │       └── UPSAuthClient.ts
+├── carriers/
+│   ├── Carrier.ts
+│   └── ups/
+│       ├── UPSAuthClient.ts
+│       ├── UPSCarrier.ts
+│       └── UPSMapper.ts
+├── domain/
+│   ├── Address.ts
+│   ├── Package.ts
+│   ├── RateQuote.ts
+│   ├── RateRequest.ts
+│   └── schemas.ts
+├── errors/
+│   └── CarrierError.ts
 ├── tests/
- │   ├── setup.ts          # test
- │   └──ups.integration.test.ts
- │
- └── index.ts                # Orchestration entry point
+│   ├── setup.ts
+│   └── ups.integration.test.ts
+└── index.ts
 
 ```
 

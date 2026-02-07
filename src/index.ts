@@ -1,4 +1,3 @@
-
 import "dotenv/config";
 import type { RateRequest } from "./domain/RateRequest";
 import { RateRequestSchema } from "./domain/schemas";
@@ -28,14 +27,37 @@ const sampleRequest: RateRequest = {
   ],
 };
 
-// Wrap logic in an async function (Node best practice)
 async function main() {
   try {
     // 1️⃣ Runtime validation
     RateRequestSchema.parse(sampleRequest);
     console.log("Rate request is valid at runtime ✅");
 
-    // 2️⃣ Call carrier (UPS)
+    /**
+     * 🟡 DEV MODE SHORT-CIRCUIT
+     * -----------------------
+     * We intentionally do NOT call the real UPS API in local dev.
+     * Real UPS rating requires production credentials and whitelisted access.
+     * Integration behavior is validated via tests using mocked HTTP calls.
+     */
+    if (process.env.NODE_ENV === "development") {
+      console.log("Using mocked UPS response for local development 🧪");
+
+      console.log("UPS Rates ✅", [
+        {
+          carrier: "UPS",
+          serviceCode: "UPS_GROUND",
+          serviceName: "UPS Ground",
+          totalCharge: 450,
+          currency: "INR",
+          estimatedDeliveryDays: 3,
+        },
+      ]);
+
+      return;
+    }
+
+    // 2️⃣ Call carrier (real path – used in prod / tests via mocks)
     const ups = new UPSCarrier();
     const rates = await ups.getRates(sampleRequest);
 
