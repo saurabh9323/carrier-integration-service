@@ -55,7 +55,6 @@ describe("UPSAuthClient", () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-// ...existing code...
   it("refreshes token when expired", async () => {
     const auth = new UPSAuthClient();
 
@@ -69,5 +68,5 @@ describe("UPSAuthClient", () => {
 
     expect(token).toBe("mock-ups-access-token");
   });
-// ...existing code...
+
 });
