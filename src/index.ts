@@ -1,3 +1,5 @@
+
+import "dotenv/config";
 import type { RateRequest } from "./domain/RateRequest";
 import { RateRequestSchema } from "./domain/schemas";
 import { UPSCarrier } from "./carriers/ups/UPSCarrier";

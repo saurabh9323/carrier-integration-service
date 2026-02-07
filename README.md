@@ -38,11 +38,12 @@ src/
  │   └── ups/
  │       ├── UPSCarrier.ts
  │       └── UPSAuthClient.ts
+├── tests/
+ │   ├── setup.ts          # test
+ │   └──ups.integration.test.ts
  │
  └── index.ts                # Orchestration entry point
- │
-tests/
- └── ups.integration.test.ts
+
 ```
 
 ---
@@ -149,7 +150,7 @@ Tests exercise the service end-to-end using mocked authentication and carrier re
 
 All configuration is environment-based.
 
-See `.env.example`:
+See `.env`:
 
 ```env
 UPS_CLIENT_ID=your_ups_client_id

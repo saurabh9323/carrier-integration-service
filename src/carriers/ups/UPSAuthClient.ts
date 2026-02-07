@@ -4,28 +4,33 @@ type TokenResponse = {
 };
 
 export class UPSAuthClient {
-  private token?: TokenResponse;
+  private token?: {
+    accessToken: string;
+    expiresAt: number;
+  };
+
+  private clientId = process.env.UPS_CLIENT_ID;
+  private clientSecret = process.env.UPS_CLIENT_SECRET;
 
   async getAccessToken(): Promise<string> {
-    // 1️⃣ Reuse token if still valid
     if (this.token && Date.now() < this.token.expiresAt) {
       return this.token.accessToken;
     }
 
-    // 2️⃣ Otherwise fetch new token (mocked)
-    const newToken = await this.fetchNewToken();
-
-    this.token = newToken;
-    return newToken.accessToken;
+    // In real implementation, clientId/clientSecret would be used here
+    return this.fetchNewToken();
   }
 
-  private async fetchNewToken(): Promise<TokenResponse> {
-    // ⛔ MOCKED: simulate UPS OAuth call
-    console.log("🔐 Fetching new UPS access token...");
+  private async fetchNewToken(): Promise<string> {
+    if (!this.clientId || !this.clientSecret) {
+      throw new Error("UPS credentials are not configured");
+    }
 
-    return {
+    this.token = {
       accessToken: "mock-ups-access-token",
-      expiresAt: Date.now() + 60 * 60 * 1000, // 1 hour
+      expiresAt: Date.now() + 60 * 60 * 1000,
     };
+
+    return this.token.accessToken;
   }
 }
